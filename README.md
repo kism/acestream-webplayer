@@ -1,6 +1,6 @@
 # Stream proxy
 
-./scripts/grab-js.sh
+`./scripts/grab-js.sh`
 
 edit `Rocket.toml`
 
