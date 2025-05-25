@@ -1,8 +1,13 @@
 body {
-  font-family: 'Monaco', 'Menlo' , Consolas, 'Liberation Mono', 'DejaVu Sans Mono', monospace;
+  font-family: "Monaco", "Menlo", Consolas, "Liberation Mono", "DejaVu Sans Mono", monospace;
   background-color: #222222;
   color: #f0f0f0;
   margin-left: 30px;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: bold;
 }
 
 p {
