@@ -7,9 +7,10 @@ services:
       - "6878:6878"
 
   rproxy:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    image: ghcr.io/kism/acestream-webplayer
     container_name: acestream-webplayer
     volumes:
       - ./private:/app/private # Ensure that these arent symlinks
