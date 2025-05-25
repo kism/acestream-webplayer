@@ -1,0 +1,20 @@
+---
+services:
+  ace:
+    image: ghcr.io/martinbjeldbak/acestream-http-proxy
+    container_name: acestream-http-proxy
+    ports:
+      - "6878:6878"
+
+  rproxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: acestream-webplayer
+    volumes:
+      - ./private:/app/private # Ensure that these arent symlinks
+      - ./Rocket.toml:/app/Rocket.toml # This is your config
+    ports:
+      - "443:443"
+    depends_on:
+      - ace

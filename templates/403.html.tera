@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>HLS PLAYER</title>
+    <script src="/static/hls.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <h1>403 FORBIDDEN</h1>
+    <p>Nope your link isnt valid</p>
+    <p>{{ message }}</p>
+</body>
+
+</html>

@@ -1,0 +1,20 @@
+## defaults for _all_ profiles
+[default]
+address = "0.0.0.0"
+limits = { form = "64 kB", json = "1 MiB" }
+ace_base_url = "http://localhost:6878"
+external_base_url = "https://example.com"
+ace_stream_id = ""
+stream_password = "secret"
+
+## set only when compiled in debug mode, i.e, `cargo build`
+[debug]
+port = 8999
+
+## set only when compiled in release mode, i.e, `cargo build --release`
+[release]
+port = 443
+
+[release.tls]
+certs = "private/fullchain.cer"
+key = "private/cert.key"

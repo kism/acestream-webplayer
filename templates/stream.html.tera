@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Ace Restreamer</title>
+  <script src="/static/hls.js"></script>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+  <h1>Ace Restreamer</h1>
+  <p>Web playback will only work depending on the stream source's audio and video codecs</p>
+  <p>Direct stream url, open with VLC or MPV</p>
+  <p>{{ stream_url }}</p>
+  <video id="video" controls width="640" height="360"></video>
+  <p>Source Ace Stream ID: {{ stream_id }}</p>
+</body>
+
+
+<script>
+  var video = document.getElementById('video');
+  var videoSrc = '{{ stream_url }}';
+  if (Hls.isSupported()) {
+    var hls = new Hls();
+    hls.loadSource(videoSrc);
+    hls.attachMedia(video);
+  }
+  // HLS.js is not supported on platforms that do not have Media Source
+  // Extensions (MSE) enabled.
+  //
+  // When the browser has built-in HLS support (check using `canPlayType`),
+  // we can provide an HLS manifest (i.e. .m3u8 URL) directly to the video
+  // element through the `src` property. This is using the built-in support
+  // of the plain video element, without using HLS.js.
+  else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    video.src = videoSrc;
+  }
+</script>
+
+</html>
