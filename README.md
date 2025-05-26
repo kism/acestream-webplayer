@@ -63,3 +63,10 @@ docker run -t -p 6878:6878 ghcr.io/martinbjeldbak/acestream-http-proxy
 ```
 
 You can also run install it with the official instructions, though its a bit limited due to using an old version of Python, and Ubuntu.
+
+## Limitations
+
+- So far its only designed to reverse proxy one stream
+- The web player will either not work or have no audio if the stream audio is AC3 encoded
+  - In theory you can use [transcode_ac3](https://wiki.acestream.media/Engine_HTTP_API) to ensure that AC3 gets transcoded, but I havent had it work in testing.
+- No chromecast or airplay support yet
