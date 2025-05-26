@@ -20,7 +20,14 @@ acme.sh --issue --standalone -d stream.example.com --fullchain-file private/full
 
 ## With Docker
 
-Edit `docker-compose.yml` to set the correct domain and paths to certificates.
+Edit `docker-compose.yml` to set the folder that containes your certificate and key.
+
+Edit `Rocket.toml`
+
+- Set `ace_base_url = "http://ace:6878"`
+- Set the tls paths relative to the mountpoint in `docker-compose.yml`
+
+Then run:
 
 ```bash
 docker compose up -d

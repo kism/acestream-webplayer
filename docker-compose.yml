@@ -6,7 +6,7 @@ services:
     ports:
       - "127.0.0.1:6878:6878"
     expose:
-      - "6878"
+      - "6878" # This makes the base url "http://ace:6878"
 
   rproxy:
     # build:
