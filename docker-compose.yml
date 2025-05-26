@@ -4,7 +4,9 @@ services:
     image: ghcr.io/martinbjeldbak/acestream-http-proxy
     container_name: acestream-http-proxy
     ports:
-      - "6878:6878"
+      - "127.0.0.1:6878:6878"
+    expose:
+      - "6878"
 
   rproxy:
     # build:

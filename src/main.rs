@@ -256,6 +256,11 @@ fn rocket() -> _ {
         "STREAM URL: {}/stream/{}",
         config.external_base_url, config.stream_password
     );
+
+    println!(
+        "Proxying stream: {}/ace/manifest.m3u8?content_id={}",
+        config.ace_base_url, config.ace_stream_id
+    );
     println!("-----------------------------------------------------------------");
 
     rocket::build()
