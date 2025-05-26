@@ -4,6 +4,7 @@
 <head>
   <title>Ace Restreamer</title>
   <script src="/static/hls.js"></script>
+  <link rel="icon" href="static/favicon.ico" type="image/x-icon" />
   <link rel="stylesheet" href="/static/style.css">
 </head>
 
