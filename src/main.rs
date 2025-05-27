@@ -25,6 +25,7 @@ struct AppConfig {
     external_base_url: String,
     ace_stream_id: String,
     stream_password: String,
+    transcode_audio: bool,
 }
 
 // Implement a method to load configuration from Rocket's Figment
@@ -36,6 +37,7 @@ impl AppConfig {
             external_base_url: figment.extract_inner("external_base_url")?,
             ace_stream_id: figment.extract_inner("ace_stream_id")?,
             stream_password: figment.extract_inner("stream_password")?,
+            transcode_audio: figment.extract_inner("transcode_audio")?,
         })
     }
 }
@@ -176,9 +178,15 @@ async fn hls_proxy(
         return Err(Status::Forbidden);
     }
 
+    // If audio transcoding is enabled, append the query parameter
+    let transcode_audio_str = match config.transcode_audio {
+        true => "transcode_audio=1&",
+        false => "",
+    };
+
     let url = format!(
-        "{}/ace/manifest.m3u8?content_id={}",
-        config.ace_base_url, config.ace_stream_id
+        "{}/ace/manifest.m3u8?{}content_id={}",
+        config.ace_base_url, transcode_audio_str, config.ace_stream_id
     );
 
     let (content_type, bytes) = fetch_and_proxy(&url).await?;

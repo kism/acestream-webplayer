@@ -3,9 +3,10 @@
 address = "0.0.0.0"
 limits = { form = "64 kB", json = "1 MiB" }
 ace_base_url = "http://localhost:6878"
-external_base_url = "https://example.com"
-ace_stream_id = ""
+external_base_url = "http://localhost:8999"
+ace_stream_id = "eab7aeef0218ce8b0752e596e4792b69eda4df5e"
 stream_password = "secret"
+transcode_audio = false # Seems to not work
 
 ## set only when compiled in debug mode, i.e, `cargo build`
 [debug]
