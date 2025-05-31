@@ -10,6 +10,9 @@ use rocket_dyn_templates::{Template, context};
 use std::fs;
 use std::io::Cursor;
 use std::path::Path;
+use std::sync::{Arc, Mutex};
+use std::thread;
+use std::time::{Duration, Instant};
 
 // Constants for M3U8 content types
 const M3U8_CONTENT_TYPES: &[(&str, &str)] = &[
@@ -17,6 +20,31 @@ const M3U8_CONTENT_TYPES: &[(&str, &str)] = &[
     ("audio", "mpegurl"),
     ("application", "x-mpegurl"),
 ];
+
+// Transcoding state management
+#[derive(Debug)]
+struct TranscodingState {
+    is_running: bool,
+    timeout: Instant,
+}
+
+impl TranscodingState {
+    fn new() -> Self {
+        Self {
+            is_running: false,
+            timeout: Instant::now(),
+        }
+    }
+
+    fn start_or_extend(&mut self) {
+        self.is_running = true;
+        self.timeout = Instant::now() + Duration::from_secs(300); // 5 minutes
+    }
+
+    fn is_expired(&self) -> bool {
+        Instant::now() > self.timeout
+    }
+}
 
 // Application configuration struct to define our settings
 #[derive(Clone)]
@@ -168,6 +196,61 @@ async fn stream_page(path: std::path::PathBuf, config: &State<AppConfig>) -> Tem
     )
 }
 
+#[get("/hls_xcoded/<path..>")]
+async fn hls_xcoded_proxy(
+    path: std::path::PathBuf,
+    config: &State<AppConfig>,
+    transcoding_state: &State<Arc<Mutex<TranscodingState>>>,
+) -> Result<ProxyResponse, Status> {
+    if path.to_str() != Some(&config.stream_password) {
+        return Err(Status::Forbidden);
+    }
+
+    // Manage transcoding state
+    {
+        let mut state = transcoding_state.lock().map_err(|_| Status::InternalServerError)?;
+
+        if !state.is_running {
+            println!("Starting transcoding thread...");
+            state.start_or_extend();
+
+            // Start the transcoding thread (placeholder for now - no actual transcoding yet)
+            let transcoding_state_clone = Arc::clone(transcoding_state);
+            thread::spawn(move || {
+                println!("Transcoding thread started with 5-minute timeout");
+
+                // TODO PUT FFMPEG HERE
+                loop {
+                    thread::sleep(Duration::from_secs(10));
+
+                    // Check if we should stop due to timeout
+                    if let Ok(mut state) = transcoding_state_clone.lock() {
+                        if state.is_expired() {
+                            println!("Transcoding thread stopping due to timeout");
+                            state.is_running = false;
+                            break;
+                        }
+                    }
+                }
+            });
+        } else {
+            println!("Extending transcoding timeout by 5 minutes");
+            state.start_or_extend();
+        }
+    }
+
+    // For now, just return a simple response indicating transcoding is active
+    let response_content = format!(
+        "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-TARGETDURATION:10\n# Transcoding active for stream {}\n",
+        config.ace_stream_id
+    );
+
+    Ok(ProxyResponse {
+        content_type: ContentType::new("application", "vnd.apple.mpegurl"),
+        data: response_content.into_bytes(),
+    })
+}
+
 // HLS proxy endpoint
 #[get("/hls/<path..>")]
 async fn hls_proxy(
@@ -269,14 +352,23 @@ fn rocket() -> _ {
         "Proxying stream: {}/ace/manifest.m3u8?content_id={}",
         config.ace_base_url, config.ace_stream_id
     );
+
+    println!(
+        "TRANSCODED STREAM URL: {}/hls_xcoded/{}",
+        config.external_base_url, config.stream_password
+    );
     println!("-----------------------------------------------------------------");
+
+    // Initialize transcoding state
+    let transcoding_state = Arc::new(Mutex::new(TranscodingState::new()));
 
     rocket::build()
         .mount(
             "/",
-            routes![index, hls_proxy, stream_page, ts_segment_proxy],
+            routes![index, hls_proxy, hls_xcoded_proxy, stream_page, ts_segment_proxy],
         )
         .mount("/static", FileServer::from("static"))
         .manage(config)
+        .manage(transcoding_state)
         .attach(Template::fairing())
 }
